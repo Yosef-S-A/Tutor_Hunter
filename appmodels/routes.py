@@ -11,6 +11,9 @@ from flask_login import login_user, current_user, logout_user, login_required
 from flask_mail import Message, Mail
 from datetime import datetime
 import smtplib
+from email.message import EmailMessage
+from datetime import timedelta
+from flask import Flask, session
 
 @app.route("/")
 @app.route("/home")
@@ -24,7 +27,7 @@ def about():
 @app.route("/tutor_list")
 def tutor_list():
     page = request.args.get('page', 1, type=int)
-    tutors = Tutor.query.paginate(page=page, per_page=2)
+    tutors = Tutor.query.paginate(page=page, per_page=3)
     return render_template('/tutor_list.html', tutors=tutors)
 
 @app.route("/register", methods=['GET', 'POST'])
@@ -70,7 +73,8 @@ def signin():
             if current_user.user_type == 'Tutor' and not(next_page):
                print(current_user.id)
                tutor = Tutor.query.get_or_404(current_user.id)
-               return render_template('tutor_home.html', title='profile', tutor=tutor)
+               return redirect(url_for('tutor_profile', tutor_id=tutor.id))
+               #return render_template('tutor_home.html', title='profile', tutor=tutor)
             return redirect(next_page) if next_page else redirect(url_for('tutor_list'))
            
         else:
@@ -142,6 +146,15 @@ def editprofile():
     image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
     return render_template('edit_profile.html', title='EditProfile', image_file=image_file, form=form)
 
+@app.route("/tutor_profile/<int:tutor_id>")
+@login_required
+def tutor_profile(tutor_id):
+    print('tutorhome')
+    if current_user.is_authenticated and current_user.user_type == 'Tutor':
+        tutor = Tutor.query.get_or_404(tutor_id)
+        return render_template('tutor_home.html', title='profile', tutor=tutor)
+    return redirect(url_for('home'))
+
 @app.route("/tutor_list/<int:tutor_id>")
 @login_required
 def tutor_home(tutor_id):
@@ -153,14 +166,29 @@ def tutor_home(tutor_id):
 
 def send_reset_email(user):
     token = user.get_reset_token()
-    msg = Message('Password Reset Request',
-                  sender='noreply@demo.com',
-                  recipients=[user.email])
-    msg.body = f'''To reset your password, visit the following link:
+    msg = EmailMessage()
+    message = f'''To reset your password, visit the following link:
 {url_for('reset_token', token=token, _external=True)}
 If you did not make this request then simply ignore this email and no changes will be made.
 '''
-    mail.send(msg)
+    msg.set_content(message)
+    msg['Subject'] = 'Password Reset Request'
+    msg['From'] = os.environ.get('MAIL_USERNAME')
+    msg['To'] = user.email
+    #ps = os.environ.get('SHELL')
+    #print(ps)
+    # Send the message via our own SMTP server.
+    server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+    server.login(os.environ.get('MAIL_USERNAME'), os.environ.get('MAIL_PASSWORD'))
+    server.send_message(msg)
+    #msg = Message('Password Reset Request',
+    #              sender=os.environ.get('MAIL_USERNAME'),
+    #              recipients=[user.email])
+    #msg.body = f'''To reset your password, visit the following link:
+#{url_for('reset_token', token=token, _external=True)}
+#If you did not make this request then simply ignore this email and no changes will be made.
+#'''
+    #mail.send(msg)
 
 @app.route("/reset_password", methods=['GET', 'POST'])
 def reset_request():
@@ -197,7 +225,6 @@ def reset_token(token):
 def send_request(recipient):
     user = User.query.filter_by(id=recipient).first_or_404()
     if user:
-        
         prequest = Parent_requests(t_id=recipient, p_id=current_user.id, date_requested=datetime.utcnow(), status="Pending")
         db.session.add(prequest)
         db.session.commit()
@@ -210,24 +237,63 @@ def requests():
     current_user.last_message_read_time = datetime.utcnow()
     db.session.commit()
     prequests = current_user.requested
-    pr=[]
+    probj={}
     for p in prequests:
-        pr.append(User.query.filter_by(id=p.p_id).first())
+        print(p.p_id)
+        print(p.t_id)
+        print(p.id)
+        if not(p.status == 'Accepted'):
+            probj[p.id]=User.query.filter_by(id=p.p_id).first()
+        #probj.append(User.query.filter_by(id=p.p_id).first()
         #print(pr.username)
-    return render_template('requests.html', pr = pr)
-    
+    if probj:
+        return render_template('requests.html', probj = probj)
+    flash ('You have no request currently','warning')
+    return redirect(url_for('tutor_profile', tutor_id=current_user.id))
 
-@app.route('/accepted/<recipient>', methods=['GET', 'POST'])
+@app.route('/accepted/<requestid>/parent/<recipient>', methods=['GET', 'POST'])
 @login_required
-def accepted(recipient):
-    user = User.query.filter_by(id=recipient).first_or_404()  
-    msg = Message('Tutor Accepted', sender='yosefsamuel11@gmail.com', recipients=[user.email])
-    msg.body = f'''{current_user.first_name} has accepted your request you can contact him via {current_user.email}.'''
-    mail.send(msg)
-    txt = f'''Your contact information is sent to {current_user.first_name}!'''
-    flash(txt, 'success')
-    return redirect(url_for('tutor_list'))
+def accepted(requestid, recipient):
+    user = User.query.filter_by(id=recipient).first_or_404()
+    msg = EmailMessage()
+    message = f'''{current_user.first_name} has accepted your request you can contact him via {current_user.email}.'''
+    msg.set_content(message)
+    msg['Subject'] = 'Tutor Accepted Your Request'
+    msg['From'] = "yosefsamuel11@gmail.com"
+    msg['To'] = user.email
+    #ps = os.environ.get('SHELL')
+    #print(ps)
+    # Send the message via our own SMTP server.
+    server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+    server.login(os.environ.get('MAIL_USERNAME'), os.environ.get('MAIL_PASSWORD'))
+    server.send_message(msg)
+#server.quit()
 
+    #message = f'''{current_user.first_name} has accepted your request you can contact him via {current_user.email}.'''
+    #server = smtplib.SMTP("smtp.gmail.com", 587)
+    #server.starttls()
+    #server.login("yosefsamuel11@gmail.com", "0929018401gS@")
+    #print(user.email)
+    #server.sendmail("yosefsamuel11@gmail.com", user.email, message)
+    
+    #msg = Message('Tutor Accepted', sender='yosefsamuel11@gmail.com', recipients=[user.email])
+    #msg.body = f'''{current_user.first_name} has accepted your request you can contact him via {current_user.email}.'''
+    #mail.send(msg)
+    #pr = Parent_requests.query.filter_by(id=p.p_id).first())
+    update_status = Parent_requests.query.filter_by(id=requestid).first()
+    update_status.status = 'Accepted'
+    db.session.commit()
+    txt = f'''Your contact information is sent to {user.first_name}!'''
+    flash(txt, 'success')
+    return redirect(url_for('requests'))
+
+@app.route('/declined/<requestid>', methods=['GET', 'POST'])
+@login_required
+def declined(requestid):
+    delete_this = Parent_requests.query.filter_by(id=requestid).first()
+    db.session.delete(delete_this)
+    db.session.commit()
+    return redirect(url_for('requests'))
     
 
 

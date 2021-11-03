@@ -43,7 +43,7 @@ class Tutor(User, db.Model):
     id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
     rate = db.Column(db.Float, nullable=False)
     header =  db.Column(db.String(120), nullable=False)
-    bio =  db.Column(db.String(500), nullable=False)
+    bio =  db.Column(db.String(2000), nullable=False)
     placesofresidence = db.Column(db.String(30), nullable=False)
     image_file = db.Column(db.String(120), nullable=False, default='default.jpg')
     requested = db.relationship('Parent_requests', foreign_keys='Parent_requests.t_id', backref='request_to', lazy=True)

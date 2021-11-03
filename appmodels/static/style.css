@@ -278,3 +278,35 @@ html
 {
 	color: #225E6E;
 }
+
+.badge
+{
+	background-color: rgba(0,204,136,0.5);
+}
+
+.alert
+{
+	z-index: 1000;
+	position: relative;
+}
+
+.btn-success
+{
+	margin-left: 15px;
+}
+
+.mr-2
+{
+	text-decoration: none;
+}
+
+.btn-info
+{
+	margin: 20px 5px;
+}
+
+#submit
+{
+	margin: 20px 0px;
+}
+

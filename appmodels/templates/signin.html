@@ -12,6 +12,15 @@
 		<header>
 			<a class="navbar-brand" href="/">Tutor Hunter</a>
 		</header>
+		{% with messages = get_flashed_messages(with_categories=true) %}
+          	{% if messages %}
+          		{% for category, message in messages %}
+          			<div class="alert alert-{{ category }}">
+                  			{{ message }}
+                		</div>	
+          		{% endfor %}	
+          	{% endif %}
+          {% endwith %}
                 <form class="form" method="POST" action="">
 			{{ form.hidden_tag() }}
                         <h1 class="title"> Sign In </h1>
