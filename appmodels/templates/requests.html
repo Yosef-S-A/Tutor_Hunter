@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+{% block content %}
+	{% for req, p in probj.items() %}
+		  <div class="card mt-4 border-light rounded">
+			  <div class="row">
+				  <div class="col-md-12">
+					  <p class="article-content"> {{ p.first_name }} has requested your tutoring service.</p>
+					  <a href="{{ url_for('users.accepted', requestid=req, recipient=p.id) }}"><button class="btn btn-success"> Accept </button></a>
+					  <a href="{{ url_for('users.declined', requestid=req) }}"><button class="btn btn-danger"> Decline  </button></a>
+				  </div>
+			</div>
+		</div>
+	{% endfor %}
+{% endblock content %}
+

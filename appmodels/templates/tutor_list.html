@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+{% block content %}
+	<h2> Find Your Tutor </h2>
+	{% for tutor in tutors. items %}
+		{% if tutor.rate != 0.0 and tutor.bio != 'empty' %}
+			<div class="card mt-4 border-light rounded">
+				<div class="row">
+					<div class="col-md-4">
+						<img src="{{ url_for('static', filename='profile_pics/' + tutor.image_file) }}" class="img-fluid rounded-circle">
+					</div>
+					<div class="col-md-8">
+						<h2 class="card-title"><a class="mr-2 name" href="{{ url_for('main.tutor_home', tutor_id=tutor.id) }}">{{ tutor.first_name }}</a></h2>
+
+						<p class="article-content"><b>About Me:</b> {{ tutor.header }}</p>
+						<p class="article-content"><b>Working Language:</b> {{ tutor.lang }}</p>
+
+						<p class="article-content"><b>Place of work:</b> {{ tutor.placesofresidence }}</p>
+
+						<p class="article-content"><b>Rate:</b> {{ tutor.rate }}</p>
+
+						<a href = "{{ url_for('main.tutor_home', tutor_id=tutor.id) }}"><button class="btn btn-success"> Read More </button></a>
+					</div>
+				</div>
+			</div>
+		{% endif %}
+	{% endfor %}
+	{% for page_num in tutors.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+		{% if page_num %}
+		  {% if tutors.page == page_num %}
+			<a class="btn btn-info" href="{{ url_for('main.tutor_list', page=page_num) }}"> {{ page_num }} </a>
+		   {% else %}
+		   	<a class="btn btn-outline-info" href="{{ url_for('main.tutor_list', page=page_num) }}"> {{ page_num }} </a>
+		   {% endif %}
+		{% else %}
+			...
+		{% endif %}	
+	{% endfor %}
+{% endblock content %}
+

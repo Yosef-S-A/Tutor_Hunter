@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+{% block content %}
+                <article class="media content-section row">
+                	<div class="col-md-2">
+                		<img class="rounded-circle article-img" src="{{ url_for('static', filename='profile_pics/' + tutor.image_file) }}">
+                	</div>
+                  	<div class="media-body col-md-2">
+                  		<div class="article-metadata">
+                  			<a class="mr-2" href="#"><h1>{{ tutor.first_name }}</h1></a>
+                  			{% if current_user.user_type == 'Parent' %}
+                  				<a class="mr-2" href="{{ url_for('users.send_request', recipient=tutor.id) }}"><button class="btn btn-primary">Request</button></a>
+                  			{% endif %}
+                  		</div>
+                  	</div>
+                  	<div class="col-md-12">
+                  		<p class="article-content"><b>Rate:</b> {{ tutor.rate }}</p>
+                  		<p class="article-content"><b>Summary:</b> {{ tutor.header }}</p>
+				<p class="article-content"><b>Working Language:</b> {{ tutor.lang }}</p>
+				<p class="article-content"><b>Place of work:</b> {{ tutor.placesofresidence }}</p>
+                  		<p class="article-content"><b>About Me:</b> {{ tutor.bio }}</p>
+                  	</div>
+                </article>
+{% endblock content %}
+
