@@ -5,6 +5,8 @@ from flask_login import LoginManager
 from flask_mail import Mail
 #from datetime import timedelta
 import os
+import pymysql
+pymysql.install_as_MySQLdb()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '6789d25fd941dab2cfcd9e6c02de038d'
