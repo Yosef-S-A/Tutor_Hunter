@@ -1,3 +1,7 @@
+#!/usr/bin/python3
+"""
+Routes to render different pages
+"""
 from flask import redirect, render_template, request, url_for, Blueprint
 from flask_login import current_user, login_required
 from appmodels import db
