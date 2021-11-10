@@ -1,5 +1,7 @@
 #!/usr/bin/python3
-
+"""
+    Flask routes that manage user related functionalities
+"""
 import secrets
 import os
 from PIL import Image
@@ -19,6 +21,9 @@ users = Blueprint('users', __name__)
 
 @users.route("/register", methods=['GET', 'POST'])
 def register():
+    """
+    Route that handles new user registration process
+    """
     if current_user.is_authenticated:
         if current_user.user_type == 'Parent':
             logout_user()
@@ -46,6 +51,9 @@ def register():
 
 @users.route("/signin", methods=['GET', 'POST'])
 def signin():
+    """
+    Route that handles authenticating and loging them into the system
+    """
     if current_user.is_authenticated:
         return redirect(url_for('main.home'))
     form = LoginForm()
@@ -67,12 +75,19 @@ def signin():
 
 @users.route("/signout")
 def signout():
+    """
+    route that logsout users from app
+    """
     logout_user()
     return redirect(url_for('main.home'))
 
 @users.route("/edityourinfo", methods=['GET', 'POST'])
 @login_required
 def edityourinfo():
+    """
+    route that enables registered users who is not tutor
+    to edit their profile
+    """
     form = UpdateParentProfileForm()
     if form.validate_on_submit():
         current_user.first_name = form.first_name.data
@@ -90,6 +105,9 @@ def edityourinfo():
 @users.route("/editprofile", methods=['GET', 'POST'])
 @login_required
 def editprofile():
+    """
+    route that enables registered Tutors to edit their profile
+    """
     form = UpdateProfileForm()
     if form.validate_on_submit():
         if form.picture.data:
@@ -120,6 +138,9 @@ def editprofile():
 
 @users.route("/reset_password", methods=['GET', 'POST'])
 def reset_request():
+    """
+    routes that handles the task of reseting password of registered users
+    """
     if current_user.is_authenticated:
         return redirect(url_for('main.home'))
     form = RequestResetForm()
@@ -133,6 +154,10 @@ def reset_request():
 
 @users.route("/reset_password/<token>", methods=['GET', 'POST'])
 def reset_token(token):
+    """
+    route that checks whether the user legitmate and it is using
+    unexpired token
+    """
     if current_user.is_authenticated:
         return redirect(url_for('main.home'))
     user = User.verify_reset_token(token)
@@ -151,6 +176,9 @@ def reset_token(token):
 @users.route('/send_request/<recipient>', methods=['GET', 'POST'])
 @login_required
 def send_request(recipient):
+    """
+    route that handles sending request to the respecitve tutor from potential client
+    """
     user = User.query.filter_by(id=recipient).first_or_404()
     if user:
         prequest = Parent_requests(t_id=recipient, p_id=current_user.id, date_requested=datetime.utcnow(), status="Pending")
@@ -162,6 +190,9 @@ def send_request(recipient):
 @users.route('/requests')
 @login_required
 def requests():
+    """
+    route that help the tutors to check if they have incoming requests
+    """
     current_user.last_message_read_time = datetime.utcnow()
     db.session.commit()
     prequests = current_user.requested
@@ -177,6 +208,9 @@ def requests():
 @users.route('/accepted/<requestid>/parent/<recipient>', methods=['GET', 'POST'])
 @login_required
 def accepted(requestid, recipient):
+    """
+    route that handle the process of accepting(the tutor) requests from potential clients
+    """
     user = User.query.filter_by(id=recipient).first_or_404()
     msg = EmailMessage()
     message = f'''{current_user.first_name} has accepted your request you can contact him via {current_user.email}.'''
@@ -197,6 +231,9 @@ def accepted(requestid, recipient):
 @users.route('/declined/<requestid>', methods=['GET', 'POST'])
 @login_required
 def declined(requestid):
+    """
+    route that handle the process(the tutor) of declining requests from potential clients
+    """
     delete_this = Parent_requests.query.filter_by(id=requestid).first()
     db.session.delete(delete_this)
     db.session.commit()
