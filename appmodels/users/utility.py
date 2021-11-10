@@ -5,7 +5,7 @@ Utility functions used by routes
 import secrets
 import os
 from PIL import Image
-from appmodels import db
+from appmodels import db, app
 from appmodels.models import User
 import smtplib
 from email.message import EmailMessage
