@@ -1,3 +1,7 @@
+#!/usr/bin/python3
+"""
+Utility functions used by routes
+"""
 import secrets
 import os
 from PIL import Image
@@ -7,6 +11,9 @@ import smtplib
 from email.message import EmailMessage
 
 def save_picture(form_picture):
+    """
+    A function that saves the image uploaded to the system by users
+    """
     random_hex = secrets.token_hex(6)
     _, f_ext = os.path.splitext(form_picture.filename)
     picture_fn = random_hex + f_ext
@@ -19,6 +26,9 @@ def save_picture(form_picture):
     return picture_fn
     
 def send_reset_email(user):
+    """
+    A function that sends a reset email with time dependent reset link
+    """
     token = user.get_reset_token()
     msg = EmailMessage()
     message = f'''To reset your password, visit the following link:
