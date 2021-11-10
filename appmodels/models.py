@@ -1,5 +1,7 @@
 #!/usr/bin/python3
-
+"""
+A class representation of database tables
+"""
 from datetime import datetime
 from appmodels import db, login_manager, app
 from flask_login import UserMixin
@@ -11,6 +13,9 @@ def load_user(user_id):
     return User.query.filter_by(id=user_id).first()
 
 class User(db.Model, UserMixin):
+    """
+    A class representation of The common attributes of tutors & non-tutors
+    """
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(20), unique=False, nullable=False)
     last_name = db.Column(db.String(20), unique=False, nullable=False)
@@ -39,7 +44,10 @@ class User(db.Model, UserMixin):
     def __repr__(self):
         return f"User('{self.first_name}', '{self.email}')"
 
-class Tutor(User, db.Model): 
+class Tutor(User, db.Model):
+    """
+    A class representation of tutors and it inherits form User class
+    """
     id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
     rate = db.Column(db.Float, nullable=False)
     header =  db.Column(db.String(120), nullable=False)
@@ -62,6 +70,9 @@ class Tutor(User, db.Model):
             Parent_requests.date_requested > last_read_time).count()
         
 class Parent_requests(db.Model):
+    """
+    A class representation of the database table that stores requests by potential client
+    """
     id = db.Column(db.Integer, primary_key=True)
     t_id = db.Column(db.Integer, db.ForeignKey('tutor.id'), nullable=False)
     p_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
