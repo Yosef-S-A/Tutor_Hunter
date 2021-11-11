@@ -25,6 +25,8 @@ TutorHunter supports the following classes:
 * Tutor
 * Parent_requests
 
+# Architecture
+
 ![Architecture](https://github.com/Yosef-S-A/Tutor_Hunter/blob/main/docs/img/architecture.png)
 
 # Environment Variables
