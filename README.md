@@ -25,7 +25,7 @@ TutorHunter supports the following classes:
 * Tutor
 * Parent_requests
 
-![Architecture](architecture.png)
+![Architecture](doc/img/architecture.png)
 
 # Environment Variables
 MAIL_USERNAME and MAIL_PASSWORD are environment variables that should be set since they are used in the application for emailing functionality.
