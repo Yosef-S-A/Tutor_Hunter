@@ -5,10 +5,10 @@ TutorHunter is a RESTful web application, integrating database storage (MySQL), 
 # Environment
 * <b>OS</b>: UBUNTU 16.04
 * <b>Language</b>: Python 3.6
-* <b>Web server</b>: nginx/?
-* <b>Application Server</b>: Flask ?, Jinja?
-* <b>Web Server Gateway</b>: gunicorn(version ?)
-* <b>Database</b>: MySQL ver ? Distrib ?
+* <b>Web server</b>: nginx/1.10.3
+* <b>Application Server</b>: Flask 2.0.2, Jinja 3.0.2
+* <b>Web Server Gateway</b>: gunicorn(version 20.1.0)
+* <b>Database</b>: MySQL ver 14.14 Distrib 5.7.33
 * <b>Style</b>
    <ul><li><b>Python</b>: PEP 8</li>
   </ul>
@@ -24,8 +24,11 @@ TutorHunter supports the following classes:
 * User
 * Tutor
 * Parent_requests
+
+![Architecture](architecture.png)
+
 # Environment Variables
 MAIL_USERNAME and MAIL_PASSWORD are environment variables that should be set since they are used in the application for emailing functionality.
 # Authors
-+ Abebayehu: <absa3852@gmail.com>
++ Abebayehu: <absa3852@gmail.com> 
 + Yosef: <Yosefsamuel22@gmail.com>
